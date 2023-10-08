@@ -14,7 +14,7 @@ contract Staking {
     uint256 public constant APR = 14; // Annual Percentage Rate (14%)
     uint256 public constant COMPOUNDING_RATIO = 10; // 1:10 compounding ratio
     uint256 public constant COMPOUNDING_FEE = 1; // 1% fee for compounding per month
-    uint256 public constant MAX_BALANCE = 5 ether; // Max Stake Amount of 5 Ether
+    uint256 public constant MAX_BALANCE = 500 ether; // Max Stake Amount of 5 Ether
 
     mapping(address => uint256) public stakedBalances;
     mapping(address => uint256) public rewards;
@@ -27,7 +27,6 @@ contract Staking {
 
     error MinStakeAmount();
     error MaxStakeAmount();
-    error InsufficientContractBal();
     error BalanceOverLimit();
     error NothingToWithdraw();
     error NoStakeToCompound();
@@ -47,9 +46,8 @@ contract Staking {
     function stake(uint256 stakingAmount) external payable {
         stakingAmount = msg.value;
         if(stakingAmount < 0.1 ether) revert MinStakeAmount();
-        if(stakingAmount > 5 ether) revert MaxStakeAmount();
-        if(address(this).balance < stakingAmount) revert InsufficientContractBal();
-        if(address(this).balance > MAX_BALANCE) revert BalanceOverLimit();
+        if(stakingAmount > 10 ether) revert MaxStakeAmount();
+        if(address(this).balance >= MAX_BALANCE) revert BalanceOverLimit();
         
         // Mint receipt tokens to the depositor
         uint256 ReceiptToMint = stakingAmount; // 1 ETH = 1 receipt token (simplified)
@@ -63,7 +61,7 @@ contract Staking {
     // Withdraw staked ETH and earned rewards
     function withdraw() external {
         uint256 stakedAmount = stakedBalances[msg.sender];
-        if(stakedAmount < 0) revert NothingToWithdraw();
+        if(stakedAmount < 0.1 ether) revert NothingToWithdraw();
         
         // Calculate and transfer rewards
         uint256 rewardAmount = calculateReward(msg.sender);
@@ -92,11 +90,11 @@ contract Staking {
 
     // Allow users to opt in for compounding
     function compound() external {
-        uint256 stakedAmount = stakedBalances[msg.sender];
+        uint256 stakedBalance = stakedBalances[msg.sender];
         uint256 rewardAmount = calculateReward(msg.sender);
 
-        if(stakedAmount < 0) revert NoStakeToCompound();
-        if(rewardAmount < 0) revert NoRewardToCompound();
+        if(stakedBalance < 0.1 ether) revert NoStakeToCompound();
+        if(rewardAmount < 0.001 ether) revert NoRewardToCompound();
 
         uint256 compoundedAmount = rewardAmount * (COMPOUNDING_RATIO);
         uint256 fee = rewardAmount * (COMPOUNDING_FEE) /(100);

@@ -30,9 +30,10 @@ contract StakingTest is Test {
         uint256 newPrincipal
     );
 
+
     function setUp() public {
-        receipt = new Receipt();
         napcalx = new Napcalx();
+        receipt = new Receipt();
         staking = new Staking(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), IStake(napcalx), IStake(receipt));
     }
 
@@ -48,7 +49,37 @@ contract StakingTest is Test {
         vm.expectRevert(staking.MaxStakeAmount.selector);
     }
 
-    function testInsufficientContractBal() public {
-        staking.stakingAmount = 4;
+    function testBalanceOverLimit() public {
+        staking.stake(0);
+        staking.stakingAmount = 5;
+        staking.balance = 501; 
+        vm.expectRevert(Staking.BalanceOverLimit.selector);
+    }
+
+    function testNothingToWithdraw() public {
+        staking.stake(0);
+        staking.stakingAmount = 3;
+        staking.balance = 200;
+        staking.stakedAmount = 0.009;
+        vm.expectRevert(Staking.NothingToWithdraw.selector);
+    }
+
+    function testNoStakeToCompound() public {
+        staking.stake(0);
+        staking.stakingAmount = 3;
+        staking.balance = 200;
+        staking.stakedAmount = 3;
+        staking.stakedBalance = 0.08;
+        vm.expectRevert(Staking.NoStakeToCompound.selector);
+    }
+
+    function testNoRewardToCompound() public {
+        staking.stake(0);
+        staking.stakingAmount = 3;
+        staking.balance = 200;
+        staking.stakedAmount = 3;
+        staking.stakedBakance = 0.1;
+        staking.rewardAmount = 0.009;
+        vm.expectRevert(Staking.NoRewardToCompound.selector);
     }
 }
