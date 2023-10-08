@@ -43,7 +43,7 @@ contract Staking {
     }
 
     // Stake ETH and receive receipt tokens
-    function stake() external payable {
+    function stake() external payable returns(bool success){
         uint256 stakingAmount = msg.value;
         if(stakingAmount < 0.1 ether) revert MinStakeAmount();
         if(stakingAmount > 10 ether) revert MaxStakeAmount();
@@ -55,6 +55,7 @@ contract Staking {
 
         // Update staked balances and rewards
         stakedBalances[msg.sender] = stakedBalances[msg.sender] + stakingAmount;
+        success = true; 
         emit Staked(msg.sender, stakingAmount);
     }
 
