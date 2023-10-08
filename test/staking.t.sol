@@ -38,26 +38,26 @@ contract StakingTest is Test {
     }
 
     function testMinStakeAmount() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 0;
         vm.expectRevert(Staking.MinStakeAmount.selector);
     }
 
     function testMaxStakeAmount() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 20;
         vm.expectRevert(staking.MaxStakeAmount.selector);
     }
 
     function testBalanceOverLimit() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 5;
         staking.balance = 501; 
         vm.expectRevert(Staking.BalanceOverLimit.selector);
     }
 
     function testNothingToWithdraw() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 3;
         staking.balance = 200;
         staking.stakedAmount = 0.009;
@@ -65,7 +65,7 @@ contract StakingTest is Test {
     }
 
     function testNoStakeToCompound() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 3;
         staking.balance = 200;
         staking.stakedAmount = 3;
@@ -74,7 +74,7 @@ contract StakingTest is Test {
     }
 
     function testNoRewardToCompound() public {
-        staking.stake(0);
+        staking.stake();
         staking.stakingAmount = 3;
         staking.balance = 200;
         staking.stakedAmount = 3;
