@@ -29,24 +29,10 @@ contract StakingTest is Test {
         uint256 newPrincipal
     );
 
-    uint256 stakerPriv1;
-    uint256 stakerPriv2;
-
-    address staker1;
-    address staker2;
-
     function setUp() public {
-        staking = new Staking(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, napcalx, receipt);
+        staking = new Staking(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), IStake(address(napcalx)), Istake(address(receipt)));
         receipt = new Receipt();
-        napcalx = new Napcalx()
-
-        (staker1, stakerPriv1) = makeAddr("STAKER");
-    }
-
-    function makeAddr (string memory name) public returns (address addr, uint256 privKey) {
-        privKey = uint256(keccak256(abi.encodePacked(name)));
-        addr = vm.addr(privKey);
-        vm.label(addr, name);
+        napcalx = new Napcalx();
     }
 
     function testMinStakeAmount() public {
